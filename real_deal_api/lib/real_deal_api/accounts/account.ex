@@ -7,6 +7,7 @@ defmodule RealDealApi.Accounts.Account do
   schema "accounts" do
     field :email, :string
     field :hash_password, :string
+    has_one :user, RealDealApi.Users.User # Creamos una relacion 1:1 entre account y user
 
     timestamps(type: :utc_datetime)
   end
