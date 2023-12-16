@@ -49,11 +49,12 @@ defmodule RealDealApi.Users do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_user(attrs \\ %{}) do
-    %User{}
-    |> User.changeset(attrs)
-    |> Repo.insert()
-  end
+ def create_user(account, attrs \\ %{}) do #Creamos un usuario asociado a una cuenta
+  account
+  |> Ecto.build_assoc(:user) #  asociación entre la cuenta (account) y el modelo de usuario (:user)
+  |> User.changeset(attrs) # aplicando los cambios del atributo
+  |> Repo.insert() # insertando el modelo de usuario en la base de datos utilizando
+end
 
   @doc """
   Updates a user.
