@@ -57,7 +57,7 @@ defmodule RealDealApi.Accounts do
     |> Repo.one()
   end
 
-  """
+
   def create_account(attrs \\ %{}) do
     %Account{}
     |> Account.changeset(attrs)
