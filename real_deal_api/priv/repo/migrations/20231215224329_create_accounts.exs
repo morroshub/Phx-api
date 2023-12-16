@@ -9,5 +9,7 @@ defmodule RealDealApi.Repo.Migrations.CreateAccounts do
 
       timestamps(type: :utc_datetime)
     end
+
+    create unique_index(:accounts, [:email]) # Nos permite interacturar con la db y el valor marcado, se usa email por que solo puede haber uno por cuenta.
   end
 end
