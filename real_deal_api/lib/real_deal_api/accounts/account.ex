@@ -14,7 +14,10 @@ defmodule RealDealApi.Accounts.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:email, :hash_password])
+    |> cast(attrs, [:email, :hash_password]) # requisitos obligatorios de la funcion
     |> validate_required([:email, :hash_password])
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/ , message: "Debe tener @ sin espacios")
+    |> validate_length(:email, max: 150) #verifica la longitud del campo asignando un maximo
+    |> unique_constraint(:email) #verifica dato unico
   end
 end
