@@ -16,7 +16,7 @@ defmodule RealDealApi.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:full_name, :gender, :biography])
-    |> validate_required([:full_name, :gender, :biography])
+    |> cast(attrs, [:account_id, :full_name, :gender, :biography]) # añadimos AID
+    |> validate_required([:account_id]) #Solo necesitamos AID para verificar
   end
 end
