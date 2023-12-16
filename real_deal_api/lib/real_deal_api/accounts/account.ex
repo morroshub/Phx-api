@@ -24,9 +24,9 @@ defmodule RealDealApi.Accounts.Account do
   end
 
   defp put_password_hash(%Ecto.Changeset{valid?: true, changes: %{hash_password: hash_password}} = changeset) do
-  change(changeset, hash_password: Bcrypt.hash_pwd_salt(hash_password))
+    change(changeset, hash_password: Bcrypt.hash_pwd_salt(hash_password))
+  end
 
   defp put_password_hash(changeset), do: changeset
-  end
 
 end
