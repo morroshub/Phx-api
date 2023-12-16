@@ -20,5 +20,13 @@ defmodule RealDealApi.Accounts.Account do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/ , message: "Debe tener @ sin espacios")
     |> validate_length(:email, max: 150) #verifica la longitud del campo asignando un maximo
     |> unique_constraint(:email) #verifica dato unico
+    |> put_password_hash()
   end
+
+  defp put_password_hash(%Ecto.Changeset{valid?: true, changes: %{hash_password: hash_password}} = changeset) do
+  change(changeset, hash_password: Bcrypt.hash_pwd_salt(hash_password))
+
+  defp put_password_hash(changeset), do: changeset
+  end
+
 end
