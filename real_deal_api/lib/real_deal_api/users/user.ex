@@ -8,7 +8,7 @@ defmodule RealDealApi.Users.User do
     field :full_name, :string
     field :gender, :string
     field :biography, :string
-    field :account_id, :binary_id
+    belongs_to :account, RealDealApi.Accounts.Account #referencia de schema y la relacion de el objeto user y el objeto account.
 
     timestamps(type: :utc_datetime)
   end
