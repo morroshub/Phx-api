@@ -8,7 +8,7 @@ defmodule RealDealApiWeb.AccountController do
 
   action_fallback RealDealApiWeb.FallbackController
 
-  defp is_authorized_account(conn, _opts) do # permite extraer un objeto del tipo "account" de la solicitud web (conn)
+  defp is_authorized_account(conn, _opts) do # permite extraer un objeto del tipo "account" de la solicitud web (conn) | le damos entidad privada a cada cuenta para que no se pueda actualizar desde fuera los datos.
     %{params: %{"account" => params}} = conn
     account = Account.get_account!(params["id"])
     if conn.assigns.account.id == account.id do
