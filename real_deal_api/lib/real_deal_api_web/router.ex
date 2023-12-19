@@ -12,22 +12,26 @@ defmodule RealDealApiWeb.Router do
     conn |> json(%{errors: message}) |> halt()
   end
 
-
-
   defp handle_errors(conn, %{reason: %{message: message}}) do
 
     conn |> json(%{errors: message}) |> halt()
   end
 
+  # Manejo de otros errores
+  defp handle_errors(conn, %{reason: %error} = _error_info) do
+    conn |> json(%{errors: "Internal Server Error"}) |> halt()
+  end
 
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_session # La información de la sesión se almacena en una cookie cifrada perpetuamos la session
   end
 
 
   pipeline :auth do
     plug RealDealApiWeb.Auth.Pipeline
+    plug RealDealApiWeb.Auth.SetAccount
   end
 
   scope "/api", RealDealApiWeb do
@@ -37,11 +41,15 @@ defmodule RealDealApiWeb.Router do
     post "/accounts/sign_in", AccountController, :sign_in
   end
 
-
+#Endpoints protegidos por Guardian/JWT
   # Requisito de JWT para nuestros endpoints desde las api
-  scope "/api", RealDealApiWeb do
+  scope "/api", RealDealApiWeb do # agrupamos y org rutas que comparten un prefijo común "/api" en este caso
     pipe_through [:api, :auth]
     get "/accounts/by_id/:id", AccountController, :show
+    post "/accounts/update", AccountController, :update
 
   end
+
+
+
 end

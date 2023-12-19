@@ -2,7 +2,7 @@ defmodule RealDealApiWeb.Auth.Guardian do
   use Guardian, otp_app: :real_deal_api
   alias RealDealApi.Accounts
 
-  def subject_for_token(%{id: id}, _cliams) do
+  def subject_for_token(%{id: id}, _claims) do
     sub = to_string(id)
     {:ok, sub}
   end
@@ -11,9 +11,9 @@ defmodule RealDealApiWeb.Auth.Guardian do
     {:error, :no_id_provided}
   end
 
-  def resource_for_claims(%{"sub" => id}) do
+  def resource_from_claims(%{"sub" => id}) do
     case Accounts.get_account!(id) do
-      nil -> {:error, :not_found}
+      nil -> {:error, :account_notexist_or_account_not_found}
       resource -> {:ok, resource}
     end
   end
@@ -23,19 +23,19 @@ defmodule RealDealApiWeb.Auth.Guardian do
   end
 
   def authenticate(email, password) do
-    case Accounts.get_account_by_email(email) do
-      nil -> {:error, :unauthored}
-      account ->
-        case validate_password(password, account.hash_password) do
-          true -> create_token(account)
-          false -> {:error, :unauthored}
-        end
-    end
-  end
+    with account <- Accounts.get_account_by_email(email),
+    true <- validate_password(password, account.hash_password),
+    {:ok, token, _claims} <- encode_and_sign(account) do
+ {:ok, account, token}
+else
+ nil -> {:error, :account_not_found}
+ false -> {:error, :invalid_password}
+ _ -> {:error, :unauthorized}
+end
 
   defp validate_password(password, hash_password) do
     Bcrypt.verify_pass(password, hash_password)
- end
+  end
 
   defp create_token(account) do
     {:ok, token, _claims} = encode_and_sign(account)
