@@ -24,14 +24,16 @@ defmodule RealDealApiWeb.Auth.Guardian do
 
   def authenticate(email, password) do
     with account <- Accounts.get_account_by_email(email),
-    true <- validate_password(password, account.hash_password),
-    {:ok, token, _claims} <- encode_and_sign(account) do
- {:ok, account, token}
-else
- nil -> {:error, :account_not_found}
- false -> {:error, :invalid_password}
- _ -> {:error, :unauthorized}
-end
+         true <- validate_password(password, account.hash_password),
+         {:ok, token, _claims} <- encode_and_sign(account) do
+      {:ok, account, token}
+    else
+      nil -> {:error, :account_not_found}
+      false -> {:error, :invalid_password}
+      _ -> {:error, :unauthorized}
+    end
+  end
+
 
   defp validate_password(password, hash_password) do
     Bcrypt.verify_pass(password, hash_password)
@@ -41,5 +43,27 @@ end
     {:ok, token, _claims} = encode_and_sign(account)
     {:ok, account, token}
   end
+
+
+  # Funciones provenientes de la documentacion de Guardian DB
+
+  def after_encode_and_sign(resource, claims, token, _options) do
+    with {:ok, _} <- Guardian.DB.after_encode_and_sign(resource, claims["typ"], claims, token) do
+      {:ok, token}
+    end
+  end
+
+  def on_verify(claims, token, _options) do
+    with {:ok, _} <- Guardian.DB.on_verify(claims, token) do
+      {:ok, claims}
+    end
+  end
+
+  def on_revoke(claims, token, _options) do
+    with {:ok, _} <- Guardian.DB.on_revoke(claims, token) do
+      {:ok, claims}
+    end
+  end
+
 
 end
