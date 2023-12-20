@@ -17,11 +17,6 @@ defmodule RealDealApiWeb.Router do
     conn |> json(%{errors: message}) |> halt()
   end
 
-  # Manejo de otros errores
-  defp handle_errors(conn, %{reason: %error} = _error_info) do
-    conn |> json(%{errors: "Internal Server Error"}) |> halt()
-  end
-
 
   pipeline :api do
     plug :accepts, ["json"]
@@ -49,7 +44,5 @@ defmodule RealDealApiWeb.Router do
     post "/accounts/update", AccountController, :update
 
   end
-
-
 
 end
