@@ -30,6 +30,17 @@ defmodule RealDealApiWeb.Auth.Guardian do
           true -> create_token(account, :access)
           false -> {:error, :unauthorized}
         end
+    end
+  end
+
+  def authenticate(token) do
+    with {:ok, claims} <- decode_and_verify(token),
+         {:ok, account} <- resource_from_claims(claims),
+         {:ok, _oldtoken, {new_token, _claims}} <- refresh(token) do
+
+      {:ok, account, new_token}
+    end
+  end
 
 
   defp validate_password(password, hash_password) do
@@ -41,18 +52,18 @@ defmodule RealDealApiWeb.Auth.Guardian do
     {:ok, account, token}
   end
 
-  defp token_options (type) do
+  defp token_options(type) do
     case type do
-      :access -> [token_type: "access", ttl: {2, hour}]
-      :reset -> [token_type: "access", ttl: {15, minute}]
-      :admin -> [token_type: "access", ttl: {20, day}]
+      :access -> [token_type: "access", ttl: {2, :hour}]
+      :reset -> [token_type: "reset", ttl: {15, :minute}]
+      :admin -> [token_type: "admin", ttl: {90, :day}]
     end
   end
 
   # Funciones provenientes de la documentacion de Guardian DB
 
   def after_encode_and_sign(resource, claims, token, _options) do
-    with {:ok, _} <- Guardian.DB.after_encode_and_sign(resource, claims["typ"], claims, token) do
+    with {:ok, _} <- Guardian.DB.after_encode_and_sign(resource, claims["type"], claims, token) do
       {:ok, token}
     end
   end
