@@ -23,27 +23,31 @@ defmodule RealDealApiWeb.Auth.Guardian do
   end
 
   def authenticate(email, password) do
-    with account <- Accounts.get_account_by_email(email),
-         true <- validate_password(password, account.hash_password),
-         {:ok, token, _claims} <- encode_and_sign(account) do
-      {:ok, account, token}
-    else
-      nil -> {:error, :account_not_found}
-      false -> {:error, :invalid_password}
-      _ -> {:error, :unauthorized}
-    end
-  end
+    case Accounts.get_account_by_email(email) do
+      nil -> {:error, :unauthored}
+      account ->
+        case validate_password(password, account.hash_password) do
+          true -> create_token(account, :access)
+          false -> {:error, :unauthorized}
+        end
 
 
   defp validate_password(password, hash_password) do
     Bcrypt.verify_pass(password, hash_password)
   end
 
-  defp create_token(account) do
-    {:ok, token, _claims} = encode_and_sign(account)
+  defp create_token(account, type) do
+    {:ok, token, _claims} = encode_and_sign(account, %{}, token_options(type)) # tiempo vencimiento de uso del token
     {:ok, account, token}
   end
 
+  defp token_options (type) do
+    case type do
+      :access -> [token_type: "access", ttl: {2, hour}]
+      :reset -> [token_type: "access", ttl: {15, minute}]
+      :admin -> [token_type: "access", ttl: {20, day}]
+    end
+  end
 
   # Funciones provenientes de la documentacion de Guardian DB
 
