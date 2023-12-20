@@ -41,6 +41,7 @@ defmodule RealDealApiWeb.Router do
   scope "/api", RealDealApiWeb do # agrupamos y org rutas que comparten un prefijo común "/api" en este caso
     pipe_through [:api, :auth]
     get "/accounts/by_id/:id", AccountController, :show
+    get "/accounts/sign_out", AccountController, :sign_out
     post "/accounts/update", AccountController, :update
 
   end
