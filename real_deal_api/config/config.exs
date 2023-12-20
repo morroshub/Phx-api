@@ -35,10 +35,11 @@ secret_key: "Pnti8jm9b2fHlCOMIfzMN6uRLX0+g/f24O/jOgLlwrLpuuWfEur9J4xZUbY9minr"  
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Use Guardian Db
 config :guardian, Guardian.DB,
-repo: RealDealApi.Repo,
-schema_name: "guardian_auth_tokens",
-sweep_interval: 20 # Minutos de tiempo antes de que expire la session
+  repo: RealDealApi.Repo,
+  schema_name: "guardian_auth_tokens",
+  sweeper_options: [interval: 60] # Minutos de tiempo antes de que expire la sesión
 
 
 
