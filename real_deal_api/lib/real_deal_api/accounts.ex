@@ -37,6 +37,16 @@ defmodule RealDealApi.Accounts do
   """
   def get_account!(id), do: Repo.get!(Account, id)
 
+
+  # Funcion agregada | Traemos todos los datos de la cuenta con la id de la misma | Pipe preload
+
+  def get_full_account(id) do
+    Account
+    |> where(id: ^id) # Este es un método de consulta de Ecto ^id se remplazará con el valor real de la variable id
+    |> preload([:user]) #Esto es útil para evitar la necesidad de realizar una consulta adicional cuando se accede al campo :user.
+    |>Repo.one()
+  end
+
   @doc """
   Gets a single account.any()
 
